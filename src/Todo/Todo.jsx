@@ -1,30 +1,18 @@
 import { Button, Input, Layout, Row, Col, Space } from "antd";
-import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import TodoTable from "./Table";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { todo_Add_Action } from "../Redux/action/todo_action";
+import { Add_TODO_Action_Load, Add_TODO_Action_Success } from "../Redux/action/todo_action";
 
 const { Header, Content, Footer } = Layout;
 
-const getLocalTodo = () => {
-  const localTodo = localStorage.getItem("todo");
-  if (localTodo) {
-    return JSON.parse(localTodo);
-  } else {
-    return [];
-  }
-};
-
 function Todo() {
-  const [todo, setTodo] = useState(getLocalTodo());
-  const [editIndex, setEditIndex] = useState(null);
+  const todo = ["Learn React", "Build a Project", "Prepare for Interview"];
+  const todo_Data = useSelector((data) => data?.todoReducer?.todo_Data);
+  console.log("TODO_Data", todo_Data);
   const dispatch = useDispatch();
-  const todoData = useSelector((data) => data)
-  console.log("Selector_todoData", todoData);
-  
-  
   const {
     control,
     handleSubmit,
@@ -34,40 +22,20 @@ function Todo() {
 
   const onSubmit = (data) => {
     if (data.todo === "") {
-      return toast.error("Todo is required");
-    } else if (editIndex !== null) {
-      const updateTodo = [...todo];
-      updateTodo[editIndex] = data.todo;
-      setTodo(updateTodo);
-      setEditIndex(null);
-      reset({ todo: "" });
-      toast.success("Todo updated successfully");
-    } else if (todo.includes(data.todo)) {
-      return toast.error("Todo already exists");
+      return;
+    } else if (todo_Data.includes(data.todo)) {
+      return toast.error("Todo Already Exist");
     } else {
-      setTodo((prevTodo) => [...prevTodo, data.todo]);
-      localStorage.setItem("todo", JSON.stringify(todo));
-      toast.success("Todo added successfully");
+      toast.success("Todo Added Successfully");
+      dispatch(Add_TODO_Action_Load(data));
+      dispatch(Add_TODO_Action_Success(data));
       reset({ todo: "" });
     }
-    dispatch(todo_Add_Action(data))
   };
 
-  const handleEdit = (data) => {
-    console.log("EditButton", index);
-        setEditIndex(index);
-    const editTodo = todo[index];
-    reset({ todo: editTodo });
-  };
+  const handleEdit = (data) => {};
 
-  const handleDelete = (index) => {
-    const deleteTodo = todo.filter((_, i) => i !== index);
-    setTodo(deleteTodo);
-  };
-
-  useEffect(() => {
-    localStorage.setItem("todo", JSON.stringify(todo));
-  }, [todo]);
+  const handleDelete = (index) => {};
 
   return (
     <Layout className="todo-layout">
@@ -97,7 +65,7 @@ function Todo() {
                   <div className="flex">
                     <Space size="middle" style={{ width: "100%" }}>
                       <Button type="primary" htmlType="submit" size="large" block>
-                        {editIndex !== null ? "Update" : "Add"}
+                        ADD
                       </Button>
                     </Space>
                     <Space size="middle" style={{ width: "100%" }}>
@@ -111,13 +79,11 @@ function Todo() {
             </form>
           </Col>
         </Row>
-        <TodoTable todo={todo} handleEdit={handleEdit} handleDelete={handleDelete} />
+        <TodoTable todo={todo_Data} handleEdit={handleEdit} handleDelete={handleDelete} />
       </Content>
 
       <Footer style={{ textAlign: "center", padding: "20px" }}>
-        <Button size="large" onClick={() => setTodo([])}>
-          Remove All
-        </Button>
+        <Button size="large">Remove All</Button>
       </Footer>
     </Layout>
   );
