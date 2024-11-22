@@ -9,6 +9,10 @@ function TodoTable({ todo, handleEdit, handleDelete }) {
       dataIndex: "serialNumber",
     },
     {
+      title: "ID",
+      dataIndex: "id",
+    },
+    {
       title: "ToDo",
       dataIndex: "todo",
     },
@@ -28,8 +32,9 @@ function TodoTable({ todo, handleEdit, handleDelete }) {
     ? todo.map((item, index) => ({
         key: index || "",
         index: index || "",
+        id: item.id || "",
         serialNumber: index + 1 || "",
-        todo: item || "",
+        todo: item.todo || "",
       }))
     : [];
 

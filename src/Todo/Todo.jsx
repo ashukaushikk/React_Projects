@@ -4,13 +4,20 @@ import { Controller, useForm } from "react-hook-form";
 import TodoTable from "./Table";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { Add_TODO_Action_Success } from "../Redux/action/todo_action";
+import {
+  Add_TODO_Action_Success,
+  Delete_All_TODOs_Action_Success,
+  Update_TODO_Action_Success,
+} from "../Redux/action/todo_action";
+import { nanoid } from "nanoid";
+import { useState } from "react";
 
 const { Header, Content, Footer } = Layout;
 
 function Todo() {
   const todo_Data = useSelector((data) => data?.todoReducer?.todo_Data);
-  console.log("TODO_Data", todo_Data);
+  const [editID, setEditID] = useState(null);
+  const uniqueId = nanoid();
   const dispatch = useDispatch();
   const {
     control,
@@ -22,19 +29,41 @@ function Todo() {
   const onSubmit = (data) => {
     if (data.todo.trim() === "") {
       return;
-    } else if (todo_Data.some((todo) => todo.toLowerCase() === data.todo.toLowerCase())) {
-      return toast.error("Todo Already Exist");
-    } else {
-      toast.success("Todo Added Successfully");
-      dispatch(Add_TODO_Action_Success({ todo: data.todo }));
+    }
+    if (editID) {
+      // Update existing todo
+      const updateToDo = todo_Data.map((item) => (item.id === editID ? { ...item, todo: data.todo.trim() } : item));
+      dispatch(Update_TODO_Action_Success(updateToDo));
       reset({ todo: "" });
+      toast.success("Todo Updated Successfully");
+      setEditID(null);
+    } else {
+      // Add new todo
+      if (todo_Data.some((todo) => todo.todo.toLowerCase() === data.todo.toLowerCase())) {
+        return toast.error("Todo Already Exist");
+      } else {
+        toast.success("Todo Added Successfully");
+        const todo = { id: uniqueId, todo: data.todo.trim() };
+        dispatch(Add_TODO_Action_Success(todo));
+        reset({ todo: "" }); // Clear input field
+      }
     }
   };
 
-  const handleEdit = (data) => {};
+  const handleEdit = (data) => {
+    if (!data.id || !data.todo) {
+      console.error("Invalid data passed to handleEdit:", data);
+      return;
+    }
+    setEditID(data.id);
+    reset({ todo: data.todo });
+  };
 
   const handleDelete = (index) => {};
 
+  const handleClearToDoList = () => {
+    dispatch(Delete_All_TODOs_Action_Success());
+  };
   return (
     <Layout className="todo-layout">
       <Header className="header bg-[#001529]">
@@ -63,7 +92,7 @@ function Todo() {
                   <div className="flex">
                     <Space size="middle" style={{ width: "100%" }}>
                       <Button type="primary" htmlType="submit" size="large" block>
-                        ADD
+                        {editID ? "Update" : "Add"}
                       </Button>
                     </Space>
                     <Space size="middle" style={{ width: "100%" }}>
@@ -80,8 +109,11 @@ function Todo() {
         <TodoTable todo={todo_Data} handleEdit={handleEdit} handleDelete={handleDelete} />
       </Content>
 
+      {/* Remove_All_ToDo_Button */}
       <Footer style={{ textAlign: "center", padding: "20px" }}>
-        <Button size="large">Remove All</Button>
+        <Button size="large" onClick={handleClearToDoList}>
+          Remove All
+        </Button>
       </Footer>
     </Layout>
   );
