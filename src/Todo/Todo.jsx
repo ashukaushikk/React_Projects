@@ -4,12 +4,11 @@ import { Controller, useForm } from "react-hook-form";
 import TodoTable from "./Table";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { Add_TODO_Action_Load, Add_TODO_Action_Success } from "../Redux/action/todo_action";
+import { Add_TODO_Action_Success } from "../Redux/action/todo_action";
 
 const { Header, Content, Footer } = Layout;
 
 function Todo() {
-  const todo = ["Learn React", "Build a Project", "Prepare for Interview"];
   const todo_Data = useSelector((data) => data?.todoReducer?.todo_Data);
   console.log("TODO_Data", todo_Data);
   const dispatch = useDispatch();
@@ -21,14 +20,13 @@ function Todo() {
   } = useForm({ defaultValues: { todo: "" } });
 
   const onSubmit = (data) => {
-    if (data.todo === "") {
+    if (data.todo.trim() === "") {
       return;
-    } else if (todo_Data.includes(data.todo)) {
+    } else if (todo_Data.some((todo) => todo.toLowerCase() === data.todo.toLowerCase())) {
       return toast.error("Todo Already Exist");
     } else {
       toast.success("Todo Added Successfully");
-      dispatch(Add_TODO_Action_Load(data));
-      dispatch(Add_TODO_Action_Success(data));
+      dispatch(Add_TODO_Action_Success({ todo: data.todo }));
       reset({ todo: "" });
     }
   };

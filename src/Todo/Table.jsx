@@ -24,12 +24,14 @@ function TodoTable({ todo, handleEdit, handleDelete }) {
     },
   ];
 
-  const dataSource = todo.map((item, index) => ({
-    key: index || "",
-    index: index || "",
-    serialNumber: index + 1 || "",
-    todo: item || "",
-  }));
+  const dataSource = todo.length
+    ? todo.map((item, index) => ({
+        key: index || "",
+        index: index || "",
+        serialNumber: index + 1 || "",
+        todo: item || "",
+      }))
+    : [];
 
   return <Table columns={columns} dataSource={dataSource} pagination={false} />;
 }
