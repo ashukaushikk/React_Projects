@@ -17,8 +17,10 @@ const { Header, Content, Footer } = Layout;
 function Todo() {
   const todo_Data = useSelector((data) => data?.todoReducer?.todo_Data);
   const [editID, setEditID] = useState(null);
+  const completed = false;
   const uniqueId = nanoid();
   const dispatch = useDispatch();
+
   const {
     control,
     handleSubmit,
@@ -26,6 +28,7 @@ function Todo() {
     formState: { errors },
   } = useForm({ defaultValues: { todo: "" } });
 
+  // Submit ToDo's Action
   const onSubmit = (data) => {
     if (data.todo.trim() === "") {
       return;
@@ -43,7 +46,7 @@ function Todo() {
         return toast.error("Todo Already Exist");
       } else {
         toast.success("Todo Added Successfully");
-        const todo = { id: uniqueId, todo: data.todo.trim() };
+        const todo = { id: uniqueId, todo: data.todo.trim(), status: completed };
         dispatch(Add_TODO_Action_Success(todo));
         reset({ todo: "" }); // Clear input field
       }
@@ -70,6 +73,17 @@ function Todo() {
   const handleClearToDoList = () => {
     dispatch(Delete_All_TODOs_Action_Success());
   };
+
+  const handleToggleStatus = (data) => {
+    console.log("Handle_Complete", data);
+    const updateToDo = todo_Data.map((item) => (item.id === data.id ? { ...item, status: !item.status } : item));
+    dispatch(Update_TODO_Action_Success(updateToDo));
+  };
+
+  const handleIncomplete = (data) => {
+    console.log("Handle_Complete", data);
+  };
+
   return (
     <Layout className="todo-layout">
       <Header className="header bg-[#001529]">
@@ -94,15 +108,18 @@ function Todo() {
                     {errors.todo && <p style={{ color: "red" }}>{errors.todo.message}</p>}
                   </div>
                 </Col>
-                <Col span={6}>
+                {/* Button Column */}
+                <Col span={5}>
                   <div className="flex">
+                    {/* ADD || Update Button */}
                     <Space size="middle" style={{ width: "100%" }}>
                       <Button type="primary" htmlType="submit" size="large" block>
                         {editID ? "Update" : "Add"}
                       </Button>
                     </Space>
+                    {/* Clear Button */}
                     <Space size="middle" style={{ width: "100%" }}>
-                      <Button type="default" danger onClick={() => reset()} size="large" block>
+                      <Button type="default" danger onClick={() => reset({ todo: "" })} size="large" block>
                         Clear
                       </Button>
                     </Space>
@@ -112,12 +129,18 @@ function Todo() {
             </form>
           </Col>
         </Row>
-        <TodoTable todo={todo_Data} handleEdit={handleEdit} handleDelete={handleDelete} />
+        <TodoTable
+          todo={todo_Data}
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
+          handleToggleStatus={handleToggleStatus}
+          handleIncomplete={handleIncomplete}
+        />
       </Content>
 
       {/* Remove_All_ToDo_Button */}
       <Footer style={{ textAlign: "center", padding: "20px" }}>
-        <Button size="large" onClick={handleClearToDoList}>
+        <Button size="large" onClick={handleClearToDoList} type="primary" danger>
           Remove All
         </Button>
       </Footer>

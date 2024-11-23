@@ -19,6 +19,8 @@ function todoReducer(state = initialState, action) {
     case reduxConstants.DELETE_ALL_TODOs_ACTION_SUCCESS:
       return { ...state, todo_Data: [] };
 
+    case reduxConstants.TOGGLE_STATUS_ACTION_SUCCESS:
+      return { ...state, todo_Data: action.payload };
     default:
       return state;
   }
