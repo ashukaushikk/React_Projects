@@ -50,6 +50,7 @@ function Todo() {
     }
   };
 
+  // Update ToDo's Action
   const handleEdit = (data) => {
     if (!data.id || !data.todo) {
       console.error("Invalid data passed to handleEdit:", data);
@@ -59,8 +60,13 @@ function Todo() {
     reset({ todo: data.todo });
   };
 
-  const handleDelete = (index) => {};
+  // Delete ToDo's Action
+  const handleDelete = (data) => {
+    const deleteToDo = todo_Data.filter((item) => item.id !== data.id);
+    dispatch(Update_TODO_Action_Success(deleteToDo));
+  };
 
+  // Remove All ToDo's Action
   const handleClearToDoList = () => {
     dispatch(Delete_All_TODOs_Action_Success());
   };

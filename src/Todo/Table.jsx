@@ -17,6 +17,10 @@ function TodoTable({ todo, handleEdit, handleDelete }) {
       dataIndex: "todo",
     },
     {
+      title: "Status",
+      dataIndex: "status",
+    },
+    {
       title: "Action",
       dataIndex: "action",
       render: (_, record) => (
@@ -35,6 +39,7 @@ function TodoTable({ todo, handleEdit, handleDelete }) {
         id: item.id || "",
         serialNumber: index + 1 || "",
         todo: item.todo || "",
+        status: item.status || "",
       }))
     : [];
 
