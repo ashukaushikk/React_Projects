@@ -19,7 +19,7 @@ export const Delete_All_TODOs_Action_Success = () => ({
   type: reduxConstants.DELETE_ALL_TODOs_ACTION_SUCCESS,
 });
 
-export const Toggle_Status_Action_Success = (payload) => ({
-  type: reduxConstants.TOGGLE_STATUS_ACTION_SUCCESS,
+export const Complete_TODO_Action_Success = (payload) => ({
+  type: reduxConstants.COMPLETE_TODO_ACTION_SUCCESS,
   payload,
 });

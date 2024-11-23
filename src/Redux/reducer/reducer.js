@@ -2,6 +2,7 @@ import reduxConstants from "../constant/reduxConstant";
 
 const initialState = {
   todo_Data: [],
+  completed_ToDo: [],
 };
 
 function todoReducer(state = initialState, action) {
@@ -17,10 +18,14 @@ function todoReducer(state = initialState, action) {
       return { ...state, todo_Data: action.payload };
 
     case reduxConstants.DELETE_ALL_TODOs_ACTION_SUCCESS:
-      return { ...state, todo_Data: [] };
+      return { ...state, todo_Data: [], completed_ToDo: [] };
 
-    case reduxConstants.TOGGLE_STATUS_ACTION_SUCCESS:
-      return { ...state, todo_Data: action.payload };
+    case reduxConstants.COMPLETE_TODO_ACTION_SUCCESS:
+      return {
+        ...state,
+        todo_Data: action.payload.inCompleteToDo,
+        completed_ToDo: [...state.completed_ToDo, action.payload.completeToDo],
+      };
     default:
       return state;
   }

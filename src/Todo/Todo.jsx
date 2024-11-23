@@ -1,11 +1,11 @@
 import { Button, Input, Layout, Row, Col, Space } from "antd";
 import { Controller, useForm } from "react-hook-form";
-// import toast from "react-hot-toast";
 import TodoTable from "./Table";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Add_TODO_Action_Success,
+  Complete_TODO_Action_Success,
   Delete_All_TODOs_Action_Success,
   Update_TODO_Action_Success,
 } from "../Redux/action/todo_action";
@@ -16,6 +16,9 @@ const { Header, Content, Footer } = Layout;
 
 function Todo() {
   const todo_Data = useSelector((data) => data?.todoReducer?.todo_Data);
+  const complete_Todo = useSelector((data) => data?.todoReducer?.completed_ToDo);
+  console.log("complete_Todo", complete_Todo);
+
   const [editID, setEditID] = useState(null);
   const completed = false;
   const uniqueId = nanoid();
@@ -74,14 +77,12 @@ function Todo() {
     dispatch(Delete_All_TODOs_Action_Success());
   };
 
-  const handleToggleStatus = (data) => {
-    console.log("Handle_Complete", data);
-    const updateToDo = todo_Data.map((item) => (item.id === data.id ? { ...item, status: !item.status } : item));
-    dispatch(Update_TODO_Action_Success(updateToDo));
-  };
-
-  const handleIncomplete = (data) => {
-    console.log("Handle_Complete", data);
+  const handleCompleteToDo = (data) => {
+    const isAlreadyCompleted = complete_Todo.some((item) => item.todo === data.todo && item.status === true);
+    if (isAlreadyCompleted) return toast.error("Todo Already Completed");
+    const completeToDo = { ...data, status: true };
+    const inCompleteToDo = todo_Data.filter((item) => item.id !== data.id);
+    dispatch(Complete_TODO_Action_Success({ completeToDo, inCompleteToDo }));
   };
 
   return (
@@ -129,19 +130,25 @@ function Todo() {
             </form>
           </Col>
         </Row>
+        {/* UnComplete ToDo Table */}
+        <br />
+        <h1 className="text-2xl font-bold mb-4 text-center">UnComplete ToDo</h1>
         <TodoTable
           todo={todo_Data}
           handleEdit={handleEdit}
           handleDelete={handleDelete}
-          handleToggleStatus={handleToggleStatus}
-          handleIncomplete={handleIncomplete}
+          handleCompleteToDo={handleCompleteToDo}
         />
+        {/* Complete ToDo Table */}
+        <br />
+        <h1 className="text-2xl font-bold mb-4 text-center">Complete ToDo</h1>
+        {<TodoTable todo={complete_Todo} />}
       </Content>
 
       {/* Remove_All_ToDo_Button */}
       <Footer style={{ textAlign: "center", padding: "20px" }}>
         <Button size="large" onClick={handleClearToDoList} type="primary" danger>
-          Remove All
+          Remove All ToDo
         </Button>
       </Footer>
     </Layout>
