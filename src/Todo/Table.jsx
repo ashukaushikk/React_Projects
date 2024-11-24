@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 import { Button, Table } from "antd";
-import { MdDelete, MdModeEdit } from "react-icons/md";
-import { FcCancel, FcOk } from "react-icons/fc";
+import { MdDelete, MdModeEdit, MdOutlineDone } from "react-icons/md";
+import { IoCheckmarkDoneSharp } from "react-icons/io5";
 
-function TodoTable({ todo, handleEdit, handleDelete, handleCompleteToDo }) {
+function TodoTable({ todo, handleEdit, handleDelete, handleCompleteToDo, editID }) {
   const columns = [
     {
       title: "Sr.No.",
@@ -32,22 +32,32 @@ function TodoTable({ todo, handleEdit, handleDelete, handleCompleteToDo }) {
       dataIndex: "action",
       render: (_, record) => (
         <div className="flex gap-2">
-          {record.status === false && (
-            <Button onClick={() => handleEdit(record)} icon={<MdModeEdit />} type="primary" className="text-xl" />
+          {/* Hide actions if editID is true */}
+          {!editID && record.status === false && (
+            <>
+              <Button
+                onClick={() => handleEdit(record)}
+                icon={<MdModeEdit />}
+                type="primary"
+                className="text-xl font-bold text-white rounded-full"
+              />
+              <Button
+                onClick={() => handleDelete(record)}
+                icon={<MdDelete />}
+                type="primary"
+                danger
+                className="text-xl font-bold text-white rounded-full"
+              />
+              <Button
+                onClick={() => handleCompleteToDo(record)}
+                icon={<MdOutlineDone />}
+                type="dashed"
+                className="text-2xl font-bold text-white bg-green-300 rounded-full"
+              />
+            </>
           )}
-          {record.status === false && (
-            <Button
-              onClick={() => handleDelete(record)}
-              icon={<MdDelete />}
-              type="primary"
-              danger
-              className="text-xl"
-            />
-          )}
-          {record.status === false ? (
-            <Button onClick={() => handleCompleteToDo(record)} icon={<FcCancel />} type="default" className="text-xl" />
-          ) : (
-            <FcOk className="text-3xl" />
+          {record.status && (
+            <IoCheckmarkDoneSharp className="text-2xl text-white bg-green-600 rounded-full p-1 size-7" />
           )}
         </div>
       ),
